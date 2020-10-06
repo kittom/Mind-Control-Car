@@ -10,7 +10,7 @@ class Classifier:
         _face_cascade = cv2.CascadeClassifier('classifiers/haarcascade_frontalface_default.xml')
         _eye_cascade = cv2.CascadeClassifier('classifiers/haarcascade_eye.xml')
 
-        def find_faces(self):
+        def find_face(self):
             img_bw = cv2.cvtColor(self,cv2.COLOR_RGB2GRAY)
             faces = Classifier._face_cascade.detectMultiScale(img_bw,1.3,5)
 
@@ -46,7 +46,7 @@ class Classifier:
             right_eye = None
 
             for (x, y, w, h) in eyes:
-                if y+h > height/2: # pass if the eye is at the bottom
+                if y+h > height/2:  # pass if the eye is at the bottom
                     pass
                 eye_center = x + w / 2  # get the eye center
                 if eye_center < width * 0.5:
