@@ -8,8 +8,8 @@ class Classifier:
 
         # haar cascades for image recognition
 
-        _face_cascade = cv2.CascadeClassifier('/Users/morgan/Desktop/COMPUTER SCI Coursework/CarComputerVision/classifiers/haarcascade_frontalface_default.xml')
-        _eye_cascade = cv2.CascadeClassifier('/Users/morgan/Desktop/COMPUTER SCI Coursework/CarComputerVision/classifiers/haarcascade_eye.xml')
+        _face_cascade = cv2.CascadeClassifier('/Users/morgan/Desktop/Mind-Control-Car/CarComputerVision/classifiers/haarcascade_frontalface_default.xml')
+        _eye_cascade = cv2.CascadeClassifier('/Users/morgan/Desktop/Mind-Control-Car/CarComputerVision/classifiers/haarcascade_eye.xml')
 
         def find_face(self, _img):
             # print(_img)
@@ -75,13 +75,13 @@ class Classifier:
 # Testing
 if __name__ == "__main__":
     classifier = Classifier()
-    img = cv2.imread("/Users/morgan/Desktop/COMPUTER SCI Coursework/CarComputerVision/test_images/IMG_0812.JPG")
+    img = cv2.imread("/Users/morgan/Desktop/Mind-Control-Car/CarComputerVision/test_images/IMG_0812.JPG")
 
     # cv2.imshow("eye", img)
     face = classifier.find_face(img)
     eyes = classifier.find_eyes(face)
     # gaussed = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY, 11, 2)
     # cv2.imshow("eye", gaussed)
-    cv2.imwrite("/Users/morgan/Desktop/COMPUTER SCI Coursework/CarComputerVision/test_images/eye_test_2.JPG", eyes[1])
+    cv2.imwrite("/Users/morgan/Desktop/Mind-Control-Car/CarComputerVision/test_images/eye_test_2.JPG", eyes[1])
     cv2.waitKey(0)
     cv2.destroyAllWindows()

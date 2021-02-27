@@ -39,7 +39,7 @@ if __name__ == "__main__":
     classifier = Classifier()
     blobDetector = BlobDetector()
 
-    img = cv2.imread("/Users/morgan/Desktop/COMPUTER SCI Coursework/CarComputerVision/test_images/IMG_0812.JPG")
+    img = cv2.imread("/Users/morgan/Desktop/Mind-Control-Car/CarComputerVision/test_images/IMG_0812.JPG")
 
     eyes = classifier.find_eyes(classifier.find_face(img))
     map(classifier.cut_eyebrows, eyes)
