@@ -6,6 +6,7 @@ class pyWave:
 
     configStr = "{ 'enableRawOutput': 'enableRawOutput', 'format': 'Json'}"
     configByte = configStr.encode()
+    val = 0
 
     def __init__(self, _host, _port):
         self.host = _host
@@ -37,17 +38,21 @@ class pyWave:
             data_json = json.loads(data)
             eSenseData = data_json["eSense"]
             attention = eSenseData["attention"]
-            return attention
+            self.val = attention
+            return self.val
 
         # loop for
         except Exception as e:
             # print(str(e))
             if str(e) == "'eSense'":
-                return None
+                return self.val
             else:
                 print(e)
-                return None
+                return self.val
 
+
+
+# testing code
 
 if __name__ == '__main__':
 
@@ -56,5 +61,7 @@ if __name__ == '__main__':
 
     print("Waiting for data")
     while True:
+        val = pywave.readData(client)
+        print(val)
 
-        print(pywave.readData(client))
+

@@ -1,5 +1,5 @@
 import cv2
-from CarComputerVision.Blob import BlobDetector
+from CarComputerVision.Blob import ImgProcessor
 from CarComputerVision.cascadeClassifer import Classifier
 
 # better way of doing this where the loop sorrounds the returns and the UI is seperate
@@ -7,7 +7,7 @@ class Video:
 
     cap = cv2.VideoCapture(0)
     classifier = Classifier()
-    blobDetector = BlobDetector()
+    blobDetector = ImgProcessor()
     keypoints = [[],[]]
 
     def mainloop(self):
@@ -19,7 +19,7 @@ class Video:
         cv2.createTrackbar('threshold-1', 'image', 0, 255, lambda: None)
         cv2.createTrackbar('threshold-2', 'image1', 0, 255, lambda: None)
         
-        while(True):
+        while True:
             # Capture frame-by-frame
             ret, frame = self.cap.read()
 
@@ -33,7 +33,7 @@ class Video:
                     try:
                         _threshold = [cv2.getTrackbarPos("threshold-1", "image"), cv2.getTrackbarPos("threshold-2", "image1")]
                     except:
-                        pass
+                        _threshold = [0,0]
                     # print(_threshold)
                     # print(_threshold[0], _threshold[1])
 
@@ -59,7 +59,8 @@ class Video:
 
 
 
-                except:
+                except Exception as e:
+                    # print(e)
                     pass
 
 
