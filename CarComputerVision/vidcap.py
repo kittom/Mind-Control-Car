@@ -1,32 +1,27 @@
 import cv2
 from CarComputerVision.Blob import ImgProcessor
 from CarComputerVision.cascadeClassifer import Classifier
+from CarComputerVision.direction import DirectionManager
+# from CarComputerVision.VideoData import VideoData
 
-class Video:
+class EyeMotionLoop:
     classifier = Classifier()
-
-    keypoints = [[], []]
 
     # class VideoData
 
     def __init__(self, camera_option=0):
         self.cap = cv2.VideoCapture(camera_option)
         self.processor = ImgProcessor()
+        self.directionManager = DirectionManager(0.4, 0.25)
+        self.prev_response = None
 
     def mainloop(self):
-        # cv2.namedWindow('image')
-        # cv2.namedWindow('image1')
-        # cv2.namedWindow('image2')
-        # cv2.namedWindow('image3')
-        #
-        # cv2.createTrackbar('threshold-1', 'image', 0, 255, lambda: None)
-        # cv2.createTrackbar('threshold-2', 'image1', 0, 255, lambda: None)
 
         while True:
             ret, frame = self.cap.read()
             if ret:
+
                 face = self.classifier.find_face(frame)
-                # print(face)
 
                 if face is not None:
                     cv2.imshow("face", face)
@@ -42,23 +37,41 @@ class Video:
 
                         cv2.imshow("threshold 1", thresholds[0])
                         cv2.imshow("threshold 2", thresholds[1])
-                        keypoint_img,keypoint = [],[]
-                        keypoint_img = self.processor.blob_process(thresholds[0])
-                        # keypoint_img[1], keypoint[1], = self.processor.blob_process(thresholds[1])
-                        cv2.imshow("threshold 2", keypoint_img)
+                        keypoint_img, keypoints = [None, None], [None, None]
+                        keypoint_img[0], keypoints[0] = self.processor.blob_process(thresholds[0])
+                        keypoint_img[1], keypoints[1] = self.processor.blob_process(thresholds[1])
+                        cv2.imshow("threshold 2", keypoint_img[0])
+                        # if keypoint_img[0] is not None and keypoint_img[1] is not None:
 
-                else:
-                    pass
+                        direction = [None, None]
 
-                if cv2.waitKey(1) & 0xFF == ord('q'):
-                    break
+                        for i in (0, len(keypoints)-1):
 
-                # When everything done, release the capture
+                            if keypoints[i] is not None:
+                                self.directionManager.calculate_thresholds(keypoint_img[i])
+                                cv2.imshow(f"dm-{i+1}", self.directionManager.display(keypoint_img[i]))
+
+                                direction[i] = self.directionManager.get_direction(keypoints[i])
+
+                        if direction != [None, None]:
+
+                            response = self.directionManager.get_direction_logic(direction)
+
+                            if response != self.prev_response:
+                                self.prev_response = response
+                                print(response)
+
+
+            else:
+                pass
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
         self.cap.release()
         cv2.destroyAllWindows()
 
 
+
 if __name__ == "__main__":
 
-    video = Video()
+    video = EyeMotionLoop()
     video.mainloop()

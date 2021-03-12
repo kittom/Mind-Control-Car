@@ -14,7 +14,7 @@ class ImgProcessor:
     def blob_process(self, _img, output_img=None):
 
         key_points = self.blob_detector.detect(_img)
-        print(key_points)
+
 
         kp = [cv2.KeyPoint(None, 0.0, None)]
         if len(key_points) >= 2:
@@ -24,13 +24,12 @@ class ImgProcessor:
         elif len(key_points) == 1:
             kp[0] = key_points[0]
 
-        print(kp[0].size)
         if output_img:
             blob_img = cv2.drawKeypoints(_img, kp, output_img, (0, 0, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
         else:
             blob_img = cv2.drawKeypoints(_img, kp, _img, (0, 0, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-        return blob_img
+        return blob_img, kp[0]
 
     @staticmethod
     def threshold_process(color_img, _threshold, erode_iterations=2, dilate_iteration=4, median_blur=5):
@@ -51,7 +50,7 @@ if __name__ == "__main__":
     img = cv2.imread("/Users/morgan/Desktop/Mind-Control-Car/CarComputerVision/test_images/blob_detection_1.png")
     threshold_img = ImgProcessor.threshold_process(img, 51)
     cv2.imshow("threshold", threshold_img)
-    blob = ImgProcessor.blob_process(threshold_img)
+    blob, kp = ImgProcessor.blob_process(threshold_img)
     cv2.imshow("Blob", blob)
 
     cv2.waitKey(0)

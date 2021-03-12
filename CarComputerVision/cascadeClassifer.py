@@ -38,9 +38,7 @@ class Classifier:
                     face_img = _img[y:y + h, x:x + w]
                 return face_img
 
-            except Exception as e:
-                print(e)
-
+            except TypeError:
                 return None
 
             # return faces # for testing and returning the portions for rectangle around face
