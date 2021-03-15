@@ -4,6 +4,7 @@ import PIL
 from PIL import Image, ImageTk
 import cv2
 
+
 # inerit tkinter functionality
 class ui(tk.Tk):
 
@@ -67,27 +68,62 @@ class VideoPage(tk.Frame):
 
     def __init__(self, parent, controller):
         self.cap = cv2.VideoCapture(0)
+        width, height = 800, 600
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
         self.logic = EyeMotionLoop()
+
         tk.Frame.__init__(self, parent)
-        self.lmain = tk.Label(self)
-        self.lmain.pack()
+        self.grid_columnconfigure(2, minsize=350)
+        # self.grid_rowconfigure(1, minsize=height)
 
-        self.get_dt()
+        self.frame_lbl = tk.Label(self, text="frame")
+        self.frame = tk.Label(self)
+        self.frame_lbl.grid(column=1, row=1)
+        self.frame.grid(column=1, row=2, rowspan=3)
+
+        self.face_lbl = tk.Label(self, text="face")
+        self.face = tk.Label(self)
+        self.face_lbl.grid(column=2, row=1, columnspan=2)
+        self.face.grid(column=2, row=2,columnspan=2)
+
+        self.eye1_lbl = tk.Label(self, text="Left Eye")
+        self.eye1 = tk.Label(self)
+        self.eye1_lbl.grid(column=2, row=3)
+        self.eye1.grid(column=2, row=4)
 
 
-    def get_dt(self):
 
+        self.update_frame()
 
-        # print("repeat")
+    def update_frame(self):
+
         _, frame = self.cap.read()
         dt = self.logic.get_data(frame)
         cv2img = dt.get_frame()
         img = PIL.Image.fromarray(cv2img)
-        imgtk = ImageTk.PhotoImage(image=img)
-        self.lmain.imgtk = imgtk
-        self.lmain.configure(image=imgtk)
+        try:
+            frame = ImageTk.PhotoImage(image=PIL.Image.fromarray(dt.get_frame()))
+            self.frame.imgtk = frame
+            self.frame.configure(image=frame)
+        except AttributeError:
+            pass
 
-        self.lmain.after(10, self.get_dt)
+        try:
+            face = ImageTk.PhotoImage(image=PIL.Image.fromarray(dt.get_face()))
+            self.face.imtk = face
+            self.face.configure(image=face)
+        except AttributeError:
+            pass
+
+        try:
+            eye1 = ImageTk.PhotoImage(image=PIL.Image.fromarray(dt.get_left_eye()))
+            self.eye1.imtk = eye1
+            self.eye1.configure(image=eye1)
+        except AttributeError:
+            pass
+
+        self.frame.after(10, self.update_frame)
 
 
 

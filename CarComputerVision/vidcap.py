@@ -7,6 +7,7 @@ from CarComputerVision.direction import DirectionManager
 
 class EyeMotionLoop:
 
+
     class VideoData:
 
         def __init__(self):
@@ -94,55 +95,50 @@ class EyeMotionLoop:
 
 
     def __init__(self):
-        # self.cap = cv2.VideoCapture(camera_option)
-        # self.
+        self.dt = self.VideoData()
         self.directionManager = DirectionManager(0.4, 0.25)
         self.prev_response = None
 
     def get_data(self, frame):
-        data = self.VideoData()
 
-        data.set_frame(frame)
+
+        buffer = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
+        self.dt.set_frame(buffer)
         face = self.classifier.find_face(frame)
 
         if face is not None:
-            data.set_face(face)
+            buffer = cv2.cvtColor(face, cv2.COLOR_BGR2RGBA)
+            self.dt.set_face(buffer)
 
             eyes = self.classifier.find_eyes(face)
 
             if eyes[0] is not None and eyes[1] is not None:
 
                 map(self.classifier.cut_eyebrows, eyes)
-                # cv2.imshow("left eye", eyes[0])
-                # cv2.imshow("Right eye", eyes[1])
-                data.set_right_eye(eyes[0])
-                data.set_left_eye(eyes[1])
+                self.dt.set_right_eye(eyes[0])
+                self.dt.set_left_eye(cv2.cvtColor(eyes[1], cv2.COLOR_BGR2RGBA))
 
                 thresholds = [self.processor.threshold_process(eyes[0], 74),
                               self.processor.threshold_process(eyes[1], 74)]
-                data.set_right_eye_threshold(thresholds[0])
-                data.set_left_eye_threshold(thresholds[1])
 
-                # cv2.imshow("threshold 1", thresholds[0])
-                # cv2.imshow("threshold 2", thresholds[1])
+                self.dt.set_right_eye_threshold(thresholds[0])
+                self.dt.set_left_eye_threshold(thresholds[1])
+
                 keypoint_img, keypoints = [None, None], [None, None]
                 keypoint_img[0], keypoints[0] = self.processor.blob_process(thresholds[0])
                 keypoint_img[1], keypoints[1] = self.processor.blob_process(thresholds[1])
-
-                # cv2.imshow("threshold 2", keypoint_img[0])
-                # if keypoint_img[0] is not None and keypoint_img[1] is not None:
 
                 direction = [None, None]
 
                 if keypoints[1] is not None:
                     self.directionManager.calculate_thresholds(keypoint_img[1])
-                    data.set_left_eye_threshold_direction(self.directionManager.display(keypoint_img[1]))
+                    self.dt.set_left_eye_threshold_direction(self.directionManager.display(keypoint_img[1]))
                     # cv2.imshow("dm-1}", self.directionManager.display(keypoint_img[1]))
                     direction[1] = self.directionManager.get_direction(keypoints[1])
 
                 if keypoints[0] is not None:
                     self.directionManager.calculate_thresholds(keypoint_img[0])
-                    data.set_right_eye_threshold_direction(self.directionManager.display(keypoint_img[0]))
+                    self.dt.set_right_eye_threshold_direction(self.directionManager.display(keypoint_img[0]))
                     # cv2.imshow("dm-0", self.directionManager.display(keypoint_img[0]))
                     direction[0] = self.directionManager.get_direction(keypoints[0])
 
@@ -151,10 +147,10 @@ class EyeMotionLoop:
                     response = self.directionManager.get_direction_logic(direction)
 
                     if response != self.prev_response:
-                        data.set_direction(response)
+                        self.dt.set_direction(response)
                         self.prev_response = response
 
-        return data
+        return self.dt
 
     # def mainloop(self):
     #
@@ -226,7 +222,7 @@ if __name__ == "__main__":
 
             dt = logic.get_data(frame)
 
-            cv2.imshow("frame", dt.get_frame())
+            # cv2.imshow("frame", dt.get_frame())
 
             # dt = logic.mainloop(dt)
             if cv2.waitKey(1) & 0xFF == ord('q'):
