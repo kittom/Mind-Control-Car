@@ -47,7 +47,7 @@ class pyWave:
             if str(e) == "'eSense'":
                 return self.val
             else:
-                print(e)
+                # print(e)
                 return self.val
 
 
