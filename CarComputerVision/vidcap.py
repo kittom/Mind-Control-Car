@@ -72,16 +72,16 @@ class EyeMotionLoop:
         def get_right_eye_blob(self):
             return self.right_eye_blob
 
-        def set_left_eye_threshold_direction(self, _img):
+        def set_left_eye_threshold_direction_display(self, _img):
             self.left_eye_threshold_direction = _img
 
-        def get_left_eye_threshold_direction(self):
+        def get_left_eye_threshold_direction_display(self):
             return self.left_eye_threshold_direction
 
-        def set_right_eye_threshold_direction(self, _img):
+        def set_right_eye_threshold_direction_display(self, _img):
             self.right_eye_threshold_direction = _img
 
-        def get_right_eye_threshold_direction(self):
+        def get_right_eye_threshold_direction_display(self):
             return self.right_eye_threshold_direction
 
         def set_direction(self, _data):
@@ -101,21 +101,19 @@ class EyeMotionLoop:
 
     def get_data(self, frame):
 
-
-        buffer = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
-        self.dt.set_frame(buffer)
+        self.dt.set_frame(cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA))
         face = self.classifier.find_face(frame)
 
         if face is not None:
-            buffer = cv2.cvtColor(face, cv2.COLOR_BGR2RGBA)
-            self.dt.set_face(buffer)
+
+            self.dt.set_face(cv2.cvtColor(face, cv2.COLOR_BGR2RGBA))
 
             eyes = self.classifier.find_eyes(face)
 
             if eyes[0] is not None and eyes[1] is not None:
 
                 map(self.classifier.cut_eyebrows, eyes)
-                self.dt.set_right_eye(eyes[0])
+                self.dt.set_right_eye(cv2.cvtColor(eyes[0], cv2.COLOR_BGR2RGBA))
                 self.dt.set_left_eye(cv2.cvtColor(eyes[1], cv2.COLOR_BGR2RGBA))
 
                 thresholds = [self.processor.threshold_process(eyes[0], 74),
@@ -132,13 +130,15 @@ class EyeMotionLoop:
 
                 if keypoints[1] is not None:
                     self.directionManager.calculate_thresholds(keypoint_img[1])
-                    self.dt.set_left_eye_threshold_direction(self.directionManager.display(keypoint_img[1]))
+                    self.dt.set_left_eye_threshold_direction_display(cv2.cvtColor(self.directionManager.display(
+                        keypoint_img[1]), cv2.COLOR_BGR2RGBA))
                     # cv2.imshow("dm-1}", self.directionManager.display(keypoint_img[1]))
                     direction[1] = self.directionManager.get_direction(keypoints[1])
 
                 if keypoints[0] is not None:
                     self.directionManager.calculate_thresholds(keypoint_img[0])
-                    self.dt.set_right_eye_threshold_direction(self.directionManager.display(keypoint_img[0]))
+                    self.dt.set_right_eye_threshold_direction_display(cv2.cvtColor(self.directionManager.display(
+                        keypoint_img[0]), cv2.COLOR_BGR2RGBA))
                     # cv2.imshow("dm-0", self.directionManager.display(keypoint_img[0]))
                     direction[0] = self.directionManager.get_direction(keypoints[0])
 
@@ -151,61 +151,6 @@ class EyeMotionLoop:
                         self.prev_response = response
 
         return self.dt
-
-    # def mainloop(self):
-    #
-    #     while True:
-    #         ret, frame = self.cap.read()
-    #         if ret:
-    #
-    #             face = self.classifier.find_face(frame)
-    #
-    #             if face is not None:
-    #                 cv2.imshow("face", face)
-    #                 eyes = self.classifier.find_eyes(face)
-    #
-    #                 if eyes[0] is not None and eyes[1] is not None:
-    #                     map(self.classifier.cut_eyebrows, eyes)
-    #                     cv2.imshow("left eye", eyes[0])
-    #                     cv2.imshow("Right eye", eyes[1])
-    #
-    #                     thresholds = [self.processor.threshold_process(eyes[0], 74),
-    #                                   self.processor.threshold_process(eyes[1], 74)]
-    #
-    #                     cv2.imshow("threshold 1", thresholds[0])
-    #                     cv2.imshow("threshold 2", thresholds[1])
-    #                     keypoint_img, keypoints = [None, None], [None, None]
-    #                     keypoint_img[0], keypoints[0] = self.processor.blob_process(thresholds[0])
-    #                     keypoint_img[1], keypoints[1] = self.processor.blob_process(thresholds[1])
-    #                     cv2.imshow("threshold 2", keypoint_img[0])
-    #                     # if keypoint_img[0] is not None and keypoint_img[1] is not None:
-    #
-    #                     direction = [None, None]
-    #
-    #                     for i in (0, len(keypoints)-1):
-    #
-    #                         if keypoints[i] is not None:
-    #                             self.directionManager.calculate_thresholds(keypoint_img[i])
-    #                             cv2.imshow(f"dm-{i+1}", self.directionManager.display(keypoint_img[i]))
-    #
-    #                             direction[i] = self.directionManager.get_direction(keypoints[i])
-    #
-    #                     if direction != [None, None]:
-    #
-    #                         response = self.directionManager.get_direction_logic(direction)
-    #
-    #                         if response != self.prev_response:
-    #                             self.prev_response = response
-    #                             print(response)
-    #
-    #
-    #         else:
-    #             pass
-    #         if cv2.waitKey(1) & 0xFF == ord('q'):
-    #             break
-    #     self.cap.release()
-    #     cv2.destroyAllWindows()
-
 
 
 if __name__ == "__main__":
@@ -222,7 +167,7 @@ if __name__ == "__main__":
 
             dt = logic.get_data(frame)
 
-            # cv2.imshow("frame", dt.get_frame())
+            cv2.imshow("frame", dt.get_frame())
 
             # dt = logic.mainloop(dt)
             if cv2.waitKey(1) & 0xFF == ord('q'):

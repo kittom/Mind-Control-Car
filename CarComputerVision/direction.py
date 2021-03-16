@@ -1,6 +1,7 @@
 import cv2
 from CarComputerVision.Blob import ImgProcessor
 
+
 class DirectionManager:
     def __init__(self, left, right):
 
