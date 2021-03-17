@@ -99,7 +99,7 @@ class EyeMotionLoop:
         self.directionManager = DirectionManager(0.4, 0.25)
         self.prev_response = None
 
-    def get_data(self, frame):
+    def get_data(self, frame, threshold_l, threshold_r, _left, _right):
 
         self.dt.set_frame(cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA))
         face = self.classifier.find_face(frame)
@@ -116,8 +116,8 @@ class EyeMotionLoop:
                 self.dt.set_right_eye(cv2.cvtColor(eyes[0], cv2.COLOR_BGR2RGBA))
                 self.dt.set_left_eye(cv2.cvtColor(eyes[1], cv2.COLOR_BGR2RGBA))
 
-                thresholds = [self.processor.threshold_process(eyes[0], 74),
-                              self.processor.threshold_process(eyes[1], 74)]
+                thresholds = [self.processor.threshold_process(eyes[0], threshold_r),
+                              self.processor.threshold_process(eyes[1], threshold_l)]
 
                 self.dt.set_right_eye_threshold(thresholds[0])
                 self.dt.set_left_eye_threshold(thresholds[1])
@@ -129,6 +129,8 @@ class EyeMotionLoop:
                 direction = [None, None]
 
                 if keypoints[1] is not None:
+                    self.directionManager.set_left(_left), self.directionManager.set_right(_right)
+
                     self.directionManager.calculate_thresholds(keypoint_img[1])
                     self.dt.set_left_eye_threshold_direction_display(cv2.cvtColor(self.directionManager.display(
                         keypoint_img[1]), cv2.COLOR_BGR2RGBA))
@@ -165,7 +167,7 @@ if __name__ == "__main__":
 
         if ret:
 
-            dt = logic.get_data(frame)
+            dt = logic.get_data(frame, 0, 0, 0, 0)
 
             cv2.imshow("frame", dt.get_frame())
 

@@ -3,6 +3,7 @@ from CarComputerVision.Blob import ImgProcessor
 
 
 class DirectionManager:
+
     def __init__(self, left, right):
 
         self.left = left
@@ -11,11 +12,27 @@ class DirectionManager:
         self.right_width = None
         self.height = None
 
+    def set_left(self, _left):
+        self.left = _left / 100
+        # print(self.left)
+
+    def get_left(self):
+        return self.left
+
+    def set_right(self, _right):
+
+        self.right = _right / 100
+
+    def get_right(self):
+        return self.right
+
     def calculate_thresholds(self, _img):
         width, self.height, _ = _img.shape
+
         self.left_width = int(width * self.left)
 
-        self.right_width = int(width * (1 - self.right))
+        self.right_width = int(width * self.right)
+        # self.right_width = int(width * (1 - self.right))
 
         return self.left_width, self.right_width
 
@@ -26,6 +43,7 @@ class DirectionManager:
 
         cv2.line(_img, left_start_point, left_end_point, (0, 0, 255), 1)
         cv2.line(_img, right_start_point, right_end_point, (0, 0, 255), 1)
+
         return _img
 
     def get_direction(self, keypoint):
