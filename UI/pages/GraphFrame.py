@@ -1,5 +1,5 @@
 import tkinter as tk
-from BrainWaveReader.pywave import pyWave
+# from BrainWaveReader.pywave import pyWave
 import matplotlib
 # matplotlib backend
 # random for testing sans EEG
@@ -9,8 +9,10 @@ from matplotlib.figure import Figure
 # for live feed
 import matplotlib.animation as animation
 from matplotlib import style
+import random
+from BrainWaveReader.FileManager import FileManager
 matplotlib.use("TkAgg")
-# import random
+
 style.use("ggplot")
 
 
@@ -19,27 +21,30 @@ class GraphFrame(tk.Frame):
 
     def animate(self, i):
         # for test case
-        # pull_data = random.randint(0, 50)
-
-        pull_data = self.pywave.readData(self.client)
+        pull_data = random.randint(0,100)
+        # pull_data = self.pywave.readData(self.client)
+        self.file_manager.add_dt(pull_data)
         self.dataList.append(pull_data)
 
-        if len(self.dataList) > 20:
-            y_list = self.dataList[len(self.dataList) - 20:len(self.dataList)]
+        if len(self.dataList) > 100:
+            y_list = self.dataList[len(self.dataList) - 100:len(self.dataList)]
         else:
             y_list = self.dataList
         self.axis.clear()
         self.axis.plot(y_list)
 
+
     def __init__(self, parent, controller):
-        self.pywave = pyWave("localhost", 13854)
-        self.client = self.pywave.connect()
-        self.figure = Figure(figsize=(5, 5), dpi=100)
+        tk.Frame.__init__(self, parent)
+        self.file_manager = FileManager()
+
+        # self.pywave = pyWave("localhost", 13854)
+        # self.client = self.pywave.connect()
+        self.figure = Figure(figsize=(10, 2), dpi=100)
         self.axis = self.figure.add_subplot(111)
 
         self.dataList = []
 
-        tk.Frame.__init__(self, parent)
         label = tk.Label(self, text="Graph Frame", font="LARGE_FONT")
         label.pack(pady=10, padx=10)
 

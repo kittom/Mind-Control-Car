@@ -2,7 +2,7 @@ import cv2
 from CarComputerVision.Blob import ImgProcessor
 from CarComputerVision.cascadeClassifer import Classifier
 from CarComputerVision.direction import DirectionManager
-
+from BrainWaveReader.FileManager import FileManager
 
 
 class EyeMotionLoop:
@@ -11,7 +11,8 @@ class EyeMotionLoop:
     class VideoData:
 
         def __init__(self):
-            pass
+
+
             self.frame = None
             self.face = None
             self.left_eye = None
@@ -23,6 +24,7 @@ class EyeMotionLoop:
             self.left_eye_threshold_direction = None
             self.right_eye_threshold_direction = None
             self.direction = None
+            self.velocity = None
 
         def set_frame(self, _img):
             self.frame = _img
@@ -90,6 +92,12 @@ class EyeMotionLoop:
         def get_direction(self):
             return self.direction
 
+        def set_velocity(self, _velocity):
+            self.velocity = _velocity
+
+        def get_velocity(self):
+            return self.velocity
+
     classifier = Classifier()
     processor = ImgProcessor()
 
@@ -97,6 +105,7 @@ class EyeMotionLoop:
     def __init__(self):
         self.dt = self.VideoData()
         self.directionManager = DirectionManager(0.4, 0.25)
+        self.file_manager = FileManager()
         self.prev_response = None
 
     def get_data(self, frame, threshold_l, threshold_r, _left, _right):
@@ -151,7 +160,7 @@ class EyeMotionLoop:
                     if response != self.prev_response:
                         self.dt.set_direction(response)
                         self.prev_response = response
-
+        self.dt.set_velocity(self.file_manager.get_dt())
         return self.dt
 
 
@@ -169,7 +178,7 @@ if __name__ == "__main__":
 
             dt = logic.get_data(frame, 0, 0, 0, 0)
 
-            cv2.imshow("frame", dt.get_frame())
+            print(dt.get_velocity())
 
             # dt = logic.mainloop(dt)
             if cv2.waitKey(1) & 0xFF == ord('q'):

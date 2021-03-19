@@ -30,7 +30,7 @@ class VideoFrame(tk.Frame):
         self.frame_lbl = tk.Label(self, text="frame")
         self.frame = tk.Label(self)
         self.frame_lbl.grid(column=1, row=1)
-        self.frame.grid(column=1, row=2, rowspan=10)
+        self.frame.grid(column=1, row=2, rowspan=11)
 
         # face
 
@@ -90,7 +90,7 @@ class VideoFrame(tk.Frame):
 
         # direction
         self.direction_lbl = tk.Label(self)
-        self.direction_lbl.grid(column=3, row=12)
+        self.direction_lbl.grid(column=2, row=12, columnspan=2)
 
         self.update_frame()
 
@@ -167,8 +167,8 @@ class VideoFrame(tk.Frame):
             pass
         try:
             direction = dt.get_direction()
-
-            self.direction_lbl.configure(text=f"direction : {direction}")
+            velocity = dt.get_velocity()
+            self.direction_lbl.configure(text=f"Direction : {direction}, Velocity : {velocity}")
         except AttributeError:
             pass
 
